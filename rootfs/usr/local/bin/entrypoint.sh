@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-##@Version           :  202309011557-git
+##@Version           :  202309011603-git
 # @@Author           :  Jason Hempstead
 # @@Contact          :  jason@casjaysdev.pro
 # @@License          :  WTFPL
 # @@ReadME           :  docker-entrypoint --help
 # @@Copyright        :  Copyright: (c) 2023 Jason Hempstead, Casjays Developments
-# @@Created          :  Friday, Sep 01, 2023 15:57 EDT
+# @@Created          :  Friday, Sep 01, 2023 16:03 EDT
 # @@File             :  docker-entrypoint
 # @@Description      :  
 # @@Changelog        :  New script
