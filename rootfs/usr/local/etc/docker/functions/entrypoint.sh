@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-##@Version           :  202308281453-git
+##@Version           :  202309030111-git
 # @@Author           :  Jason Hempstead
 # @@Contact          :  git-admin@casjaysdev.pro
-# @@License          :  WTFPL
+# @@License          :  LICENSE.md
 # @@ReadME           :  docker-entrypoint --help
 # @@Copyright        :  Copyright: (c) 2023 Jason Hempstead, Casjays Developments
-# @@Created          :  Monday, Aug 28, 2023 14:53 EDT
+# @@Created          :  Sunday, Sep 03, 2023 01:40 EDT
 # @@File             :  docker-entrypoint
 # @@Description      :  functions for my docker containers
 # @@Changelog        :  newScript
@@ -41,8 +41,8 @@ __is_dir_empty() { [ "$(ls -A "$1" 2>/dev/null | wc -l)" -eq 0 ] && return 0 || 
 __pcheck() { [ -n "$(which pgrep 2>/dev/null)" ] && pgrep -o "$1" &>/dev/null || return 10; }
 __file_exists_with_content() { [ -n "$1" ] && [ -f "$1" ] && [ -s "$1" ] && return 0 || return 2; }
 __sed() { sed -i 's|'$1'|'$2'|g' "$3" &>/dev/null || sed -i "s|$1|$2|g" "$3" &>/dev/null || return 1; }
-__ps() { [ -f "$(type -P ps)" ] && ps "$@" 2>/dev/null | grep -Fw " ${1:-$GEN_SCRIPT_REPLACE_APPNAME}" || return 10; }
-__pgrep() { __pcheck "${1:-GEN_SCRIPT_REPLACE_APPNAME}" || __ps "${1:-$GEN_SCRIPT_REPLACE_APPNAME}" | grep -qv ' grep' || return 10; }
+__ps() { [ -f "$(type -P ps)" ] && ps "$@" 2>/dev/null | grep -Fw " ${1:-$debian}" || return 10; }
+__pgrep() { __pcheck "${1:-debian}" || __ps "${1:-$debian}" | grep -qv ' grep' || return 10; }
 __get_ip6() { ip a 2>/dev/null | grep -w 'inet6' | awk '{print $2}' | grep -vE '^::1|^fe' | sed 's|/.*||g' | head -n1 | grep '^' || echo ''; }
 __get_ip4() { ip a 2>/dev/null | grep -w 'inet' | awk '{print $2}' | grep -vE '^127.0.0' | sed 's|/.*||g' | head -n1 | grep '^' || echo '127.0.0.1'; }
 __find_file_relative() { find "$1"/* -not -path '*env/*' -not -path '.git*' -type f 2>/dev/null | sed 's|'$1'/||g' | sort -u | grep -v '^$' | grep '^' || false; }
@@ -575,7 +575,7 @@ __initialize_web_health() {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  file_dir
 __initialize_replace_variables() {
-  [ $# -ne 0 ] || return 1 # REPLACE_GITEA_PROTO
+  [ $# -ne 0 ] || return 1
   __find_replace "REPLACE_SSL_DIR" "${SSL_DIR:-/etc/ssl}" "$1"
   __find_replace "REPLACE_RANDOM_ID" "$(__random_password 8)" "$1"
   __find_replace "REPLACE_TZ" "${TZ:-${TIMEZONE:-America/New_York}}" "$1"
@@ -602,16 +602,30 @@ __initialize_replace_variables() {
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 __initialize_database() {
-  [ -n "$user_name" ] && __replace "REPLACE_USER_NAME" "$user_name" "$1"
-  [ -n "$user_pass" ] && __replace "REPLACE_USER_PASS" "$user_pass" "$1"
-  [ -n "$user_name" ] && __replace "REPLACE_DATABASE_USER" "$user_name" "$1"
-  [ -n "$user_pass" ] && __replace "REPLACE_DATABASE_PASS" "$user_pass" "$1"
-  [ -n "$root_user_name" ] && __replace "REPLACE_ROOT_ADMIN" "$root_user_name" "$1"
-  [ -n "$root_user_pass" ] && __replace "REPLACE_ROOT_PASS" "$root_user_pass" "$1"
-  [ -n "$root_user_name" ] && __replace "REPLACE_DATABASE_ROOT_USER" "$root_user_name" "$1"
-  [ -n "$root_user_pass" ] && __replace "REPLACE_DATABASE_ROOT_PASS" "$root_user_pass" "$1"
+  [ "$IS_DATABASE_SERVICE" = "yes" ] || return 0
+  local db_normal_user="${DATABASE_USER_NORMAL:-$user_name}"
+  local db_normal_pass="${DATABASE_PASS_NORMAL:-$user_pass}"
+  local db_admin_user="${DATABASE_USER_ROOT:-$root_user_name}"
+  local db_admin_pass="${DATABASE_PASS_ROOT:-$root_user_pass}"
+  [ -n "$db_normal_user" ] && __replace "REPLACE_USER_NAME" "$db_normal_user" "$1"
+  [ -n "$db_normal_pass" ] && __replace "REPLACE_USER_PASS" "$db_normal_pass" "$1"
+  [ -n "$db_normal_user" ] && __replace "REPLACE_DATABASE_USER" "$db_normal_user" "$1"
+  [ -n "$db_normal_pass" ] && __replace "REPLACE_DATABASE_PASS" "$db_normal_pass" "$1"
+  [ -n "$db_admin_user" ] && __replace "REPLACE_ROOT_ADMIN" "$db_admin_user" "$1"
+  [ -n "$db_admin_pass" ] && __replace "REPLACE_ROOT_PASS" "$db_admin_pass" "$1"
+  [ -n "$db_admin_user" ] && __replace "REPLACE_DATABASE_ROOT_USER" "$db_admin_user" "$1"
+  [ -n "$db_admin_pass" ] && __replace "REPLACE_DATABASE_ROOT_PASS" "$db_admin_pass" "$1"
   [ -n "$DATABASE_NAME" ] && __replace "REPLACE_DATABASE_NAME" "$DATABASE_NAME" "$1"
   [ -n "$DATABASE_DIR" ] && __replace "REPLACE_DATABASE_DIR" "$DATABASE_DIR" "$1"
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+__initialize_db_users() {
+  [ "$IS_DATABASE_SERVICE" = "yes" ] || return 0
+  db_normal_user="${DATABASE_USER_NORMAL:-$user_name}"
+  db_normal_pass="${DATABASE_PASS_NORMAL:-$user_pass}"
+  db_admin_user="${DATABASE_USER_ROOT:-$root_user_name}"
+  db_admin_pass="${DATABASE_PASS_ROOT:-$root_user_pass}"
+  export user_name="$db_normal_user" user_pass="$db_normal_pass" root_user_name="$db_admin_user" root_user_pass="$db_admin_pass"
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 __initialize_system_etc() {
