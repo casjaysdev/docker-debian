@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-##@Version           :  202309031558-git
+##@Version           :  202309031647-git
 # @@Author           :  Jason Hempstead
 # @@Contact          :  jason@casjaysdev.pro
 # @@License          :  WTFPL
 # @@ReadME           :  docker-entrypoint --help
 # @@Copyright        :  Copyright: (c) 2023 Jason Hempstead, Casjays Developments
-# @@Created          :  Sunday, Sep 03, 2023 15:58 EDT
+# @@Created          :  Sunday, Sep 03, 2023 16:47 EDT
 # @@File             :  docker-entrypoint
 # @@Description      :  
 # @@Changelog        :  New script
@@ -26,7 +26,7 @@
 # shellcheck disable=SC2317
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Set bash options
-CONTAINER_NAME="debian"
+CONTAINER_NAME="docker-debian"
 SCRIPT_NAME="$(basename "$0" 2>/dev/null)"
 [ "$DEBUGGER" = "on" ] && echo "Enabling debugging" && set -o pipefail -x$DEBUGGER_OPTIONS || set -o pipefail
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -208,7 +208,7 @@ EOF
 if [ "$ENTRYPOINT_FIRST_RUN" != "no" ]; then
   # Show start message
   if [ "$CONFIG_DIR_INITIALIZED" = "false" ] || [ "$DATA_DIR_INITIALIZED" = "false" ]; then
-    [ "$ENTRYPOINT_MESSAGE" = "yes" ] && echo "Executing entrypoint script for debian"
+    [ "$ENTRYPOINT_MESSAGE" = "yes" ] && echo "Executing entrypoint script for docker-debian"
   fi
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Set reusable variables
