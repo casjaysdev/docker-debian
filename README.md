@@ -25,13 +25,10 @@ cp -Rfva "$HOME/.local/share/CasjaysDev/dockermgr/debian/rootfs/." "$HOME/.local
 docker run -d \
 --restart always \
 --privileged \
---name casjaysdevdocker-debian \
+--name casjaysdev-debian \
 --hostname debian \
 -e TZ=${TIMEZONE:-America/New_York} \
--v "$HOME/.local/share/srv/docker/casjaysdevdocker-debian/rootfs/data:/data:z" \
--v "$HOME/.local/share/srv/docker/casjaysdevdocker-debian/rootfs/config:/config:z" \
--p 80:80 \
-casjaysdevdocker/debian:latest
+casjaysdev/debian:latest
 ```
   
 ## via docker-compose  
@@ -40,39 +37,34 @@ casjaysdevdocker/debian:latest
 version: "2"
 services:
   ProjectName:
-    image: casjaysdevdocker/debian
-    container_name: casjaysdevdocker-debian
+    image: casjaysdev/debian
+    container_name: casjaysdev-debian
     environment:
       - TZ=America/New_York
       - HOSTNAME=debian
-    volumes:
-      - "$HOME/.local/share/srv/docker/casjaysdevdocker-debian/rootfs/data:/data:z"
-      - "$HOME/.local/share/srv/docker/casjaysdevdocker-debian/rootfs/config:/config:z"
-    ports:
-      - 80:80
     restart: always
 ```
   
 ## Get source files  
   
 ```shell
-dockermgr download src casjaysdevdocker/debian
+dockermgr download src casjaysdev/debian
 ```
   
 OR
   
 ```shell
-git clone "https://github.com/casjaysdevdocker/debian" "$HOME/Projects/github/casjaysdevdocker/debian"
+git clone "https://github.com/casjaysdev/debian" "$HOME/Projects/github/casjaysdev/debian"
 ```
   
 ## Build container  
   
 ```shell
-cd "$HOME/Projects/github/casjaysdevdocker/debian"
+cd "$HOME/Projects/github/casjaysdev/debian"
 buildx 
 ```
   
 ## Authors  
   
 🤖 casjay: [Github](https://github.com/casjay) 🤖  
-⛵ casjaysdevdocker: [Github](https://github.com/casjaysdevdocker) [Docker](https://hub.docker.com/u/casjaysdevdocker) ⛵  
+⛵ casjaysdev: [Github](https://github.com/casjaysdev) [Docker](https://hub.docker.com/u/casjaysdev) ⛵  
