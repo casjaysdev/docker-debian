@@ -1,7 +1,7 @@
 # Docker image for debian using the debian template
 ARG IMAGE_NAME="debian"
 ARG PHP_SERVER="debian"
-ARG BUILD_DATE="202408091319"
+ARG BUILD_DATE="202408091346"
 ARG LANGUAGE="en_US.UTF-8"
 ARG TIMEZONE="America/New_York"
 ARG WWW_ROOT_DIR="/usr/share/httpd/default"
@@ -63,15 +63,15 @@ ENV TIMEZONE="${TZ}"
 ENV LANG="${LANGUAGE}"
 ENV TERM="xterm-256color"
 ENV HOSTNAME="casjaysdevdocker-debian"
-ENV DEBIAN_FRONTEND=""
+ENV DEBIAN_FRONTEND="${DEBIAN_FRONTEND}"
 
 USER ${USER}
 WORKDIR /root
 
 RUN set -e; \
-  echo "Settingup prerequisites"; \
+  echo "Setting up prerequisites"; \
   echo 'export DEBIAN_FRONTEND="'${DEBIAN_FRONTEND}'"' >"/etc/profile.d/apt.sh" && chmod 755 "/etc/profile.d/apt.sh"; \
-  apt update && apt install -yy bash locales; \
+  apt update && apt install -yy bash locales apt-utils; \
   update-alternatives --install /bin/sh sh /bin/bash 1; \
   echo "$LANG UTF-8" >"/etc/locale.gen"; \
   dpkg-reconfigure --frontend=noninteractive locales;update-locale LANG=$LANG
@@ -93,11 +93,7 @@ RUN echo "Creating and editing system files "; \
   if [ -f "/root/docker/setup/system" ];then echo "Running the system script";bash "/root/docker/setup/system";echo "Done running the system script";fi; \
   echo ""
 
-RUN echo ""; \
-  $SHELL_OPTS; \
-  echo ""
-
-RUN echo ""; \
+RUN echo "Running pre-package commands"; \
   $SHELL_OPTS; \
   echo ""
 
@@ -149,7 +145,7 @@ RUN echo "Setting up users and scripts "; \
   if [ -f "/root/docker/setup/users" ];then echo "Running the users script";bash "/root/docker/setup/users";echo "Done running the users script";fi; \
   echo ""
 
-RUN echo ""; \
+RUN echo "Running the user init commands"; \
   $SHELL_OPTS; \
   echo ""
 
@@ -163,10 +159,6 @@ echo ""
 
 RUN echo "Running custom commands"; \
   if [ -f "/root/docker/setup/custom" ];then echo "Running the custom script";bash "/root/docker/setup/custom";echo "Done running the custom script";fi; \
-  echo ""
-
-RUN echo ""; \
-  $SHELL_OPTS; \
   echo ""
 
 RUN echo "Running final commands before cleanup"; \
@@ -217,43 +209,41 @@ ARG PHP_SERVER
 USER ${USER}
 WORKDIR /root
 
-LABEL \
-  maintainer="CasjaysDev <docker-admin@casjaysdev.pro>" \
-  org.opencontainers.image.vendor="CasjaysDev" \
-  org.opencontainers.image.authors="CasjaysDev" \
-  org.opencontainers.image.description="Containerized version of ${IMAGE_NAME}" \
-  org.opencontainers.image.name="${IMAGE_NAME}" \
-  org.opencontainers.image.base.name="${IMAGE_NAME}" \
-  org.opencontainers.image.license="${LICENSE}" \
-  org.opencontainers.image.build-date="${BUILD_DATE}" \
-  org.opencontainers.image.version="${BUILD_VERSION}" \
-  org.opencontainers.image.schema-version="${BUILD_VERSION}" \
-  org.opencontainers.image.url="https://hub.docker.com/r/casjaysdev/debian" \
-  org.opencontainers.image.url.source="https://hub.docker.com/r/casjaysdev/debian" \
-  org.opencontainers.image.vcs-type="Git" \
-  org.opencontainers.image.vcs-ref="${BUILD_VERSION}" \
-  org.opencontainers.image.vcs-url="https://github.com/casjaysdev/debian" \
-  org.opencontainers.image.documentation="https://github.com/casjaysdev/debian" \
-  com.github.containers.toolbox="false"
+LABEL maintainer="CasjaysDev <docker-admin@casjaysdev.pro>"
+LABEL org.opencontainers.image.vendor="CasjaysDev"
+LABEL org.opencontainers.image.authors="CasjaysDev"
+LABEL org.opencontainers.image.description="Containerized version of ${IMAGE_NAME}"
+LABEL org.opencontainers.image.name="${IMAGE_NAME}"
+LABEL org.opencontainers.image.base.name="${IMAGE_NAME}"
+LABEL org.opencontainers.image.license="${LICENSE}"
+LABEL org.opencontainers.image.build-date="${BUILD_DATE}"
+LABEL org.opencontainers.image.version="${BUILD_VERSION}"
+LABEL org.opencontainers.image.schema-version="${BUILD_VERSION}"
+LABEL org.opencontainers.image.url="https://hub.docker.com/r/casjaysdev/debian"
+LABEL org.opencontainers.image.url.source="https://hub.docker.com/r/casjaysdev/debian"
+LABEL org.opencontainers.image.vcs-type="Git"
+LABEL org.opencontainers.image.vcs-ref="${BUILD_VERSION}"
+LABEL org.opencontainers.image.vcs-url="https://github.com/casjaysdev/debian"
+LABEL org.opencontainers.image.documentation="https://github.com/casjaysdev/debian"
+LABEL com.github.containers.toolbox="false"
 
-ENV \
-  ENV=~/.bashrc \
-  USER="${USER}" \
-  SHELL="/bin/bash" \
-  TZ="${TIMEZONE}" \
-  TIMEZONE="${TZ}" \
-  LANG="${LANGUAGE}" \
-  TERM="xterm-256color" \
-  PORT="${SERVICE_PORT}" \
-  ENV_PORTS="${EXPOSE_PORTS}" \
-  CONTAINER_NAME="${IMAGE_NAME}" \
-  HOSTNAME="casjaysdev-${IMAGE_NAME}" \
-  PHP_SERVER="${PHP_SERVER}" \
-  NODE_VERSION="${NODE_VERSION}" \
-  NODE_MANAGER="${NODE_MANAGER}" \
-  PHP_VERSION="${PHP_VERSION}" \
-  DISTRO_VERSION="${IMAGE_VERSION}" \
-  WWW_ROOT_DIR="${WWW_ROOT_DIR}"
+ENV ENV=~/.bashrc
+ENV USER="${USER}"
+ENV SHELL="/bin/bash"
+ENV TZ="${TIMEZONE}"
+ENV TIMEZONE="${TZ}"
+ENV LANG="${LANGUAGE}"
+ENV TERM="xterm-256color"
+ENV PORT="${SERVICE_PORT}"
+ENV ENV_PORTS="${EXPOSE_PORTS}"
+ENV CONTAINER_NAME="${IMAGE_NAME}"
+ENV HOSTNAME="casjaysdev-${IMAGE_NAME}"
+ENV PHP_SERVER="${PHP_SERVER}"
+ENV NODE_VERSION="${NODE_VERSION}"
+ENV NODE_MANAGER="${NODE_MANAGER}"
+ENV PHP_VERSION="${PHP_VERSION}"
+ENV DISTRO_VERSION="${IMAGE_VERSION}"
+ENV WWW_ROOT_DIR="${WWW_ROOT_DIR}"
 
 COPY --from=build /. /
 
