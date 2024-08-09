@@ -1,7 +1,7 @@
 # Docker image for debian using the debian template
 ARG IMAGE_NAME="debian"
 ARG PHP_SERVER="debian"
-ARG BUILD_DATE="202408091255"
+ARG BUILD_DATE="202408091319"
 ARG LANGUAGE="en_US.UTF-8"
 ARG TIMEZONE="America/New_York"
 ARG WWW_ROOT_DIR="/usr/share/httpd/default"
@@ -69,8 +69,12 @@ USER ${USER}
 WORKDIR /root
 
 RUN set -e; \
-  echo "installing bash"; \
-  apt update && apt install -yy bash locales
+  echo "Settingup prerequisites"; \
+  echo 'export DEBIAN_FRONTEND="'${DEBIAN_FRONTEND}'"' >"/etc/profile.d/apt.sh" && chmod 755 "/etc/profile.d/apt.sh"; \
+  apt update && apt install -yy bash locales; \
+  update-alternatives --install /bin/sh sh /bin/bash 1; \
+  echo "$LANG UTF-8" >"/etc/locale.gen"; \
+  dpkg-reconfigure --frontend=noninteractive locales;update-locale LANG=$LANG
 
 ENV SHELL="/bin/bash"
 
@@ -84,11 +88,9 @@ RUN echo "Initializing the system"; \
 
 RUN echo "Creating and editing system files "; \
   $SHELL_OPTS; \
+  [ -f "/root/.profile" ] || touch "/root/.profile"; \
   mkdir -p "${DEFAULT_DATA_DIR}" "${DEFAULT_CONF_DIR}" "${DEFAULT_TEMPLATE_DIR}" "/root/docker/setup" "/etc/profile.d"; \
-  echo 'export DEBIAN_FRONTEND="'${DEBIAN_FRONTEND}'"' >"/etc/profile.d/apt.sh" && chmod 755 "/etc/profile.d/apt.sh"; \
-  pkmgr update && pkmgr install locales && echo "$LANG UTF-8" >"/etc/locale.gen"; \
-  dpkg-reconfigure --frontend=noninteractive locales;update-locale LANG=$LANG; \
-  if [ -f "/root/docker/setup/system" ];then echo "Running the system script";sh "/root/docker/setup/system";echo "Done running the system script";fi; \
+  if [ -f "/root/docker/setup/system" ];then echo "Running the system script";bash "/root/docker/setup/system";echo "Done running the system script";fi; \
   echo ""
 
 RUN echo ""; \
@@ -136,7 +138,6 @@ RUN echo "Updating system files "; \
   if [ "$PHP_VERSION" != "system" ] && [ -e "/etc/php" ] && [ -d "/etc/${PHP_VERSION}" ];then rm -Rf "/etc/php";fi; \
   if [ "$PHP_VERSION" != "system" ] && [ -n "${PHP_VERSION}" ] && [ -d "/etc/${PHP_VERSION}" ];then ln -sf "/etc/${PHP_VERSION}" "/etc/php";fi; \
   if [ -f "/root/docker/setup/files" ];then echo "Running the files script";bash "/root/docker/setup/files";echo "Done running the files script";fi; \
-  update-alternatives --install /bin/sh sh /bin/bash 1; \
   echo ""
 
 RUN echo "Custom Settings"; \
