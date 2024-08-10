@@ -78,6 +78,7 @@ RUN set -e; \
   dpkg-reconfigure --frontend=noninteractive locales;update-locale LANG=$LANG
 
 ENV SHELL="/bin/bash"
+SHELL [ "/bin/bash", "-c" ]
 
 COPY ./rootfs/usr/local/bin/pkmgr /usr/local/bin/pkmgr
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
