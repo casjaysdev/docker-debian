@@ -19,9 +19,10 @@ jobs:
       - name: Get Meta
         id: meta
         run: |
+          echo DOCKER_TAG=13 >> $GITHUB_OUTPUT
+          echo DOCKER_TAG_NAME=trixie >> $GITHUB_OUTPUT
           echo REPO_VERSION=$(git describe --tags --always | sed 's/^v//') >> $GITHUB_OUTPUT
           echo DOCKER_ORG=$(echo ${GITHUB_REPOSITORY} | awk -F"/" '{print $1}') >> $GITHUB_OUTPUT
-          echo DOCKER_TAG=$([ -n "$DOCKER_TAG" ] && echo ${DOCKER_TAG} || echo "13") >> $GITHUB_OUTPUT
           echo DOCKER_HUB=$([ -n "$DOCKER_HUB" ] && echo ${DOCKER_HUB} || echo "docker.io") >> $GITHUB_OUTPUT
           echo REPO_NAME=$(echo ${GITHUB_REPOSITORY} | awk -F"/" '{print $2}' | sed 's|^docker-||g') >> $GITHUB_OUTPUT
           echo "$DOCKER_HUB/$DOCKER_ORG/$REPO_NAME:$DOCKER_TAG"
@@ -47,3 +48,4 @@ jobs:
           push: true
           tags: | # replace it with your local IP and tags
             ${{ steps.meta.outputs.DOCKER_HUB }}/${{ steps.meta.outputs.DOCKER_ORG }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.DOCKER_TAG }}
+            ${{ steps.meta.outputs.DOCKER_HUB }}/${{ steps.meta.outputs.DOCKER_ORG }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.DOCKER_TAG_NAME }}
