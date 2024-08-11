@@ -55,7 +55,7 @@ ARG PHP_SERVER
 ARG SHELL_OPTS
 ARG DEBIAN_FRONTEND
 
-ARG PACK_LIST="bash-completion git curl wget sudo unzip tini xz-utils iproute2 pinentry-curses bsd-mailx procps net-tools bsd-mailx postfix python3-pip certbot ca-certificates "
+ARG PACK_LIST="bash-completion git curl wget sudo unzip tini xz-utils iproute2 pinentry-curses bsd-mailx procps net-tools bsd-mailx postfix python3-pip certbot ca-certificates jq "
 
 ENV ENV=~/.profile
 ENV SHELL="/bin/sh"
@@ -76,6 +76,8 @@ RUN set -e; \
   echo 'export DEBIAN_FRONTEND="'${DEBIAN_FRONTEND}'"' >"/etc/profile.d/apt.sh" && chmod 755 "/etc/profile.d/apt.sh"; \
   apt update && apt install -yy bash locales apt-utils; \
   update-alternatives --install /bin/sh sh /bin/bash 1; \
+  update-alternatives --install /usr/bin/sh sh /bin/bash 1; \
+  update-alternatives --install /usr/bin/bash sh /bin/bash 1; \
   echo "$LANG UTF-8" >"/etc/locale.gen"; \
   dpkg-reconfigure --frontend=noninteractive locales;update-locale LANG=$LANG
 
