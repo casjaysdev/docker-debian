@@ -69,6 +69,8 @@ ENV DEBIAN_FRONTEND="${DEBIAN_FRONTEND}"
 USER ${USER}
 WORKDIR /root
 
+COPY ./rootfs/usr/local/bin/. /usr/local/bin/
+
 RUN set -e; \
   echo "Setting up prerequisites"; \
   echo 'export DEBIAN_FRONTEND="'${DEBIAN_FRONTEND}'"' >"/etc/profile.d/apt.sh" && chmod 755 "/etc/profile.d/apt.sh"; \
@@ -80,7 +82,6 @@ RUN set -e; \
 ENV SHELL="/bin/bash"
 SHELL [ "/bin/bash", "-c" ]
 
-COPY ./rootfs/usr/local/bin/. /usr/local/bin/
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
 
 RUN echo "Initializing the system"; \
