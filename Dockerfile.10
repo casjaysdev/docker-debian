@@ -76,9 +76,8 @@ RUN set -e; \
   echo "$LANG UTF-8" >"/etc/locale.gen"; \
   echo 'export DEBIAN_FRONTEND="'${DEBIAN_FRONTEND}'"' >"/etc/profile.d/apt.sh" && chmod 755 "/etc/profile.d/apt.sh"; \
   apt update && apt install -yy bash locales apt-utils; \
-  update-alternatives --install /bin/sh sh /bin/bash 1; \
-  update-alternatives --install /usr/bin/sh sh /bin/bash 1; \
-  dpkg-reconfigure --frontend=noninteractive locales;update-locale LANG=$LANG
+  dpkg-reconfigure --frontend=noninteractive locales;update-locale LANG=$LANG; \
+  update-alternatives --install /bin/sh sh /bin/bash 1 
 
 ENV SHELL="/bin/bash"
 SHELL [ "/bin/bash", "-c" ]
