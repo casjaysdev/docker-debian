@@ -1,0 +1,5 @@
+alias q='exit'
+alias c='clear'
+alias quit='exit'
+alias ls='ls -lhA --color'
+alias grep='grep -s  --color'
