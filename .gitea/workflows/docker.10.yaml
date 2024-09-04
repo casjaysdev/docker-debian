@@ -20,12 +20,12 @@ jobs:
         id: meta
         env:
           TAG: 10
-          ORG: ${{ vars.DOCKER_ORG }}
-          HUB: ${{ vars.DOCKER_HUB }}
+          ORG: casjaysdev
+          HUB: docker.io
         run: |
           echo DATE_TAG=$(date +'%y%m') >> $GITHUB_OUTPUT
           echo REPO_VERSION=$(git describe --tags --always | sed 's/^v//') >> $GITHUB_OUTPUT
-          echo DOCKER_ORG=$([ -n "$ORG" ] && echo "$ORG" || echo ${GITHUB_REPOSITORY} | awk -F"/" '{print $1}') >> $GITHUB_OUTPUT
+          echo DOCKER_ORG=$([ -n "$ORG" ] && echo "$ORG" || echo "casjaysdev") >> $GITHUB_OUTPUT
           echo DOCKER_TAG=$([ -n "$TAG" ] && echo ${DOCKER_TAG} || echo "19/04") >> $GITHUB_OUTPUT
           echo DOCKER_HUB=$([ -n "$HUB" ] && echo ${DOCKER_HUB} || echo "docker.io") >> $GITHUB_OUTPUT
           echo REPO_NAME=$(echo ${GITHUB_REPOSITORY} | awk -F"/" '{print $2}' | sed 's|^docker-||g') >> $GITHUB_OUTPUT
